@@ -953,6 +953,9 @@ function render(vnode, parent, merge) {
 var Slider = (function (Component$$1) {
 	function Slider() {
 		Component$$1.call(this);
+		this.dragging = this.dragging.bind(this);
+		this.stopDrag = this.stopDrag.bind(this);
+
 		this.state.current = 0;
 		this.state.offsets = [];
 	}
@@ -973,8 +976,43 @@ var Slider = (function (Component$$1) {
 		this.setState({offsets: offsets, maxLabelWidth: maxLabelWidth});
 	};
 
+	Slider.prototype.startDrag = function startDrag (event) {
+		document.body.addEventListener('pointermove', this.dragging);
+		document.body.addEventListener('pointerup', this.stopDrag);
+		document.body.addEventListener('pointercancel', this.stopDrag);
+		this.setState({dragging: true, dragOffset: this.state.offsets[this.state.current]});
+		this.dragOrigin = event.clientX;
+		event.preventDefault();
+	};
+
+	Slider.prototype.dragging = function dragging (event) {
+		// Update offset from distance moved since last event.
+		var dragOffset = this.state.dragOffset - this.dragOrigin + event.clientX;
+		this.dragOrigin = event.clientX;
+		// Update current image by comparing offsets of neighboring labels.
+		var ref = this.state;
+		var current = ref.current;
+		var offsets = ref.offsets;
+		if (current < offsets.length - 1 && dragOffset < (offsets[current] + offsets[current+1]) / 2)
+			{ current += 1; }
+		else if (current > 0 && dragOffset > (offsets[current-1] + offsets[current]) / 2)
+			{ current -= 1; }
+		this.setState({dragOffset: dragOffset, current: current});
+	};
+
+	Slider.prototype.stopDrag = function stopDrag () {
+		document.body.removeEventListener('pointermove', this.dragging);
+		document.body.removeEventListener('pointerup', this.stopDrag);
+		document.body.removeEventListener('pointercancel', this.stopDrag);
+		this.setState({dragging: false});
+	};
+
 	Slider.prototype.componentDidMount = function componentDidMount () {
 		this.updateOffsets();
+	};
+
+	Slider.prototype.componentWillUnmount = function componentWillUnmount () {
+		this.stopDrag();
 	};
 
 	Slider.prototype.render = function render$$1 (ref, ref$1) {
@@ -984,19 +1022,21 @@ var Slider = (function (Component$$1) {
 		var current = ref$1.current;
 		var offsets = ref$1.offsets;
 		var maxLabelWidth = ref$1.maxLabelWidth;
+		var dragging = ref$1.dragging;
+		var dragOffset = ref$1.dragOffset;
 
 		var ref$2 = labels[current];
 		var name = ref$2.name;
 		var title = ref$2.title;
 		var img = src.replace('{}', name);
-		var offset = offsets[current];
+		var offset = dragging ? dragOffset : offsets[current];
 		return (
 			h( 'div', { class: "slider" },
 				h( 'img', { class: "slider-image", src: img, alt: title }),
 
-				h( 'div', { class: "slider-wrapper" },
+				h( 'div', { class: "slider-wrapper", onPointerDown: function (e) { return this$1.startDrag(e); } },
 					h( 'div', { class: "marker", style: ("width: " + maxLabelWidth + "px"), ref: function (el) { return this$1.marker = el; } }),
-					h( 'ol', { class: "slider-controls", style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
+					h( 'ol', { class: ("slider-controls " + (dragging ? '-dragging' : '')), style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
 						labels.map(function (ref, index) {
 								var title = ref.title;
 
