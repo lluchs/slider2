@@ -8,6 +8,7 @@
 .slider-wrapper {
 	position: relative;
 	overflow: hidden;
+	touch-action: none;
 }
 
 .marker {
@@ -28,4 +29,8 @@
 	position: absolute;
 	top: 0;
 	width: 100%;
+}
+
+.slider-controls:not(.-dragging) {
+	transition: left 0.5s;
 }

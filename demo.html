@@ -3,9 +3,17 @@
 <title>Slider2 Demo</title>
 
 <link rel="stylesheet" href="slider.css">
+<style>
+	body {
+		/* make sure the body is large enough to receive events */
+		min-height: 100vh;
+	}
+</style>
 
 <h1>Slider2</h1>
 
+<!-- Pointer Events polyfill -->
+<script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
 <script src="out/slider.js"></script>
 <script>
 	var slider = new Slider2(document.body, {
