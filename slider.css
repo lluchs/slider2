@@ -1,0 +1,33 @@
+.slider {
+}
+
+.slider-image {
+	width: 100%;
+}
+
+.slider-wrapper {
+	position: relative;
+	overflow: hidden;
+}
+
+.marker {
+	border: 1px solid red;
+	height: 1.2em;
+	width: 2em;
+	margin: auto;
+	padding: 0 0.5em;
+}
+
+.slider-controls {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: space-between;
+
+	position: absolute;
+	top: 0;
+	width: 100%;
+
+	transition: left 0.5s;
+}
