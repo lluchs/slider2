@@ -1,0 +1,23 @@
+<!doctype html>
+
+<title>Slider2 Demo</title>
+
+<link rel="stylesheet" href="slider.css">
+
+<h1>Slider2</h1>
+
+<script src="out/slider.js"></script>
+<script>
+	var slider = new Slider2(document.body, {
+		src: 'http://zoomoringer.de/slider/images/Blende/{}.jpg',
+		labels: [
+			{ title: '1.8', name: '1_8' },
+			{ title: '2.8', name: '2_8' },
+			//{ title: '3.5', name: '3_5' },
+			{ title: '5.6', name: '5_6' },
+			{ title: '8',   name: '8' },
+			{ title: '11',  name: '11' },
+			{ title: '18',  name: '18' },
+		],
+	});
+</script>
