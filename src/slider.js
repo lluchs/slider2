@@ -66,7 +66,7 @@ class SlidingControl extends Component {
 	updateOffsets() {
 		let controls = Array.from(this.controls.children)
 		let maxLabelWidth = controls.reduce(((max, n) => Math.max(max, n.offsetWidth)), 0)
-		let base = this.marker.offsetLeft + this.marker.offsetWidth / 2
+		let base = maxLabelWidth / 2
 		let offsets = controls.map(n => base - n.offsetLeft - n.offsetWidth / 2)
 		this.setState({offsets, maxLabelWidth})
 	}
@@ -128,12 +128,10 @@ class SlidingControl extends Component {
 
 	componentDidMount() {
 		this.updateOffsets()
-		window.addEventListener('resize', this.updateOffsets)
 	}
 
 	componentWillUnmount() {
 		this.stopDrag()
-		window.removeEventListener('resize', this.updateOffsets)
 	}
 
 	render({desc, labels, current, onChange}, {offsets, maxLabelWidth, dragging, dragOffset}) {
@@ -146,12 +144,13 @@ class SlidingControl extends Component {
 					<span>{desc} <strong>{title}</strong></span>
 					<button style={`visibility: ${current < labels.length - 1 ? 'visible' : 'hidden'}`} onClick={() => onChange(current + 1)}>→</button>
 				</div>
-				<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
-					{labels.map(({title}, index) =>
-						<li class={classNames(current == index && '-current')} onClick={() => onChange(index)}>{title}</li>
-					)}
-				</ol>
-				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}></div>
+				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}>
+					<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
+						{labels.map(({title}, index) =>
+							<li class={classNames(current == index && '-current')} onClick={() => onChange(index)}>{title}</li>
+						)}
+					</ol>
+				</div>
 			</div>
 		)
 	}
