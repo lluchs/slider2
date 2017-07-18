@@ -150,6 +150,7 @@ class SlidingControl extends Component {
 							<li class={classNames(current == index && '-current')} onClick={() => onChange(index)}>{title}</li>
 						)}
 					</ol>
+					<div class="border"></div>
 				</div>
 			</div>
 		)

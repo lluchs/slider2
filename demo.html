@@ -9,9 +9,69 @@
 		min-height: 100vh;
 	}
 
-	.sliding-control > .marker {
-		border: 1px solid red;
-	}
+.image-slider {
+    line-height: 0;
+}
+
+.image-slider ol li:before {
+  /* Don't show a counter on the slider labels */
+  content: none;
+}
+
+.sliding-control {
+    background: linear-gradient(to right, #303030 0%,#3F3F3F 50%,#303030 100%);
+    color: white;
+    font-size: 22px;
+    font-family: 'Droid Sans', sans-serif;
+    padding: 40px;
+    cursor: e-resize;
+}
+
+.sliding-control > .marker {
+    position: relative;
+    top: 38px;
+}
+
+.sliding-control > .marker > .border {
+    border-left: 2px solid lightgrey;
+    border-right: 2px solid lightgrey;
+}
+
+.image-slider .caption {
+    line-height: 3em;
+    font-family: 'Droid Sans', sans-serif;
+    font-size: 21px;
+}
+
+.sliding-control > .labels > li:not(:last-child) {
+    /*border-right: 2px solid grey;*/
+  }
+
+.sliding-control > .labels > li {
+    padding: 0 3em;
+    margin-right: 0;
+}
+
+.sliding-control .labels {
+    line-height: 1em;
+    background: #303030;
+}
+
+button {
+    font-size: 20px;
+    font-weight: 800;
+    padding: 15px 40px;
+    background: #303030;
+    border: 1px solid lightgrey;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: white;
+    color: #303030;
+    transition: 0.25s;
+}
 </style>
 
 <h1>Slider2</h1>
