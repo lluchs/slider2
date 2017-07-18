@@ -42,6 +42,7 @@ class SlidingControl extends Component {
 		super()
 		this.dragging = this.dragging.bind(this)
 		this.stopDrag = this.stopDrag.bind(this)
+		this.updateOffsets = this.updateOffsets.bind(this)
 
 		this.state.offsets = []
 	}
@@ -86,10 +87,12 @@ class SlidingControl extends Component {
 
 	componentDidMount() {
 		this.updateOffsets()
+		window.addEventListener('resize', this.updateOffsets)
 	}
 
 	componentWillUnmount() {
 		this.stopDrag()
+		window.removeEventListener('resize', this.updateOffsets)
 	}
 
 	render({labels, current, onChange}, {offsets, maxLabelWidth, dragging, dragOffset}) {
