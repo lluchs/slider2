@@ -9,6 +9,16 @@
 	overflow: hidden;
 	touch-action: none;
 
+	> .caption {
+		display: flex;
+		justify-content: center;
+		text-align: center;
+
+		> span {
+			flex: 1;
+		}
+	}
+
 	> .marker {
 		border: 1px solid red;
 		height: 1.2em;
@@ -25,7 +35,7 @@
 		justify-content: flex-start;
 
 		position: absolute;
-		top: 0;
+		bottom: 0;
 		
 		> li {
 			margin-right: 3em;

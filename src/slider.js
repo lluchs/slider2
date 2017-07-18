@@ -33,13 +33,13 @@ class Slider extends Component {
 		this.setState({current: index})
 	}
 
-	render({labels}, {current, offsets, maxLabelWidth, dragging, dragOffset}) {
+	render({desc, labels}, {current, offsets, maxLabelWidth, dragging, dragOffset}) {
 		let label, {name, title} = label = labels[current]
 		let img = this.labelToSrc(label)
 		return (
 			<div class="image-slider">
 				<img src={img} alt={title} />
-				<SlidingControl labels={labels} current={current} onChange={this.setCurrent} />
+				<SlidingControl desc={desc} labels={labels} current={current} onChange={this.setCurrent} />
 			</div>
 		)
 	}
@@ -119,11 +119,16 @@ class SlidingControl extends Component {
 		window.removeEventListener('resize', this.updateOffsets)
 	}
 
-	render({labels, current, onChange}, {offsets, maxLabelWidth, dragging, dragOffset}) {
+	render({desc, labels, current, onChange}, {offsets, maxLabelWidth, dragging, dragOffset}) {
 		let {name, title} = labels[current]
 		let offset = dragging ? dragOffset : offsets[current]
 		return (
 			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel}>
+				<div class="caption">
+					<button style={`visibility: ${current > 0 ? 'visible' : 'hidden'}`} onClick={() => onChange(current - 1)}>←</button>
+					<span>{desc} <strong>{title}</strong></span>
+					<button style={`visibility: ${current < labels.length - 1 ? 'visible' : 'hidden'}`} onClick={() => onChange(current + 1)}>→</button>
+				</div>
 				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}></div>
 				<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
 					{labels.map(({title}, index) =>
@@ -141,6 +146,6 @@ function classNames() {
 
 export default class Slider2 {
 	constructor(el, options) {
-		render(<Slider src={options.src} labels={options.labels} />, el)
+		render(<Slider desc={options.desc} src={options.src} labels={options.labels} />, el)
 	}
 }
