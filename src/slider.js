@@ -23,8 +23,8 @@ class Slider extends Component {
 		let {name, title} = labels[current]
 		let img = src.replace('{}', name)
 		return (
-			<div class="slider">
-				<img class="slider-image" src={img} alt={title} />
+			<div class="image-slider">
+				<img src={img} alt={title} />
 				<SlidingControl labels={labels} current={current} onChange={this.setCurrent} />
 			</div>
 		)
@@ -99,16 +99,20 @@ class SlidingControl extends Component {
 		let {name, title} = labels[current]
 		let offset = dragging ? dragOffset : offsets[current]
 		return (
-			<div class="slider-wrapper" onPointerDown={e => this.startDrag(e)}>
+			<div class="sliding-control" onPointerDown={e => this.startDrag(e)}>
 				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}></div>
-				<ol class={`slider-controls ${dragging ? '-dragging' : ''}`} style={`left: ${offset}px`} ref={el => this.controls = el}>
+				<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
 					{labels.map(({title}, index) =>
-						<li class={current == index ? 'current' : ''} onClick={() => onChange(index)}>{title}</li>
+						<li class={classNames(current == index && '-current')} onClick={() => onChange(index)}>{title}</li>
 					)}
 				</ol>
 			</div>
 		)
 	}
+}
+
+function classNames() {
+	return Array.from(arguments).filter(a => !!a).join(' ')
 }
 
 export default class Slider2 {
