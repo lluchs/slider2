@@ -138,7 +138,7 @@ class SlidingControl extends Component {
 		let {name, title} = labels[current]
 		let offset = dragging ? dragOffset : offsets[current]
 		return (
-			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel} onKeyDown={this.arrowButton} tabindex="0">
+			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel} onKeyDown={this.arrowButton} tabindex="0" touch-action="none">
 				<div class="caption">
 					<button style={`visibility: ${current > 0 ? 'visible' : 'hidden'}`} onClick={() => onChange(current - 1)}>←</button>
 					<span>{desc} <strong>{title}</strong></span>
