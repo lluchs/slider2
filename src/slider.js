@@ -33,13 +33,14 @@ class Slider extends Component {
 
 // Provides a sliding selection control.
 // Props:
-//  - el: Element which can be dragged
 //  - labels: Array of labels with {name, title}
 //  - current: Index of currently active label
 //  - onChange(i): Function called when current changes to i
 class SlidingControl extends Component {
 	constructor() {
 		super()
+		this.wheel = this.wheel.bind(this)
+		this.startDrag = this.startDrag.bind(this)
 		this.dragging = this.dragging.bind(this)
 		this.stopDrag = this.stopDrag.bind(this)
 		this.updateOffsets = this.updateOffsets.bind(this)
@@ -53,6 +54,15 @@ class SlidingControl extends Component {
 		let base = this.marker.offsetLeft + this.marker.offsetWidth / 2
 		let offsets = controls.map(n => base - n.offsetLeft - n.offsetWidth / 2)
 		this.setState({offsets, maxLabelWidth})
+	}
+
+	wheel(event) {
+		let {labels, current, onChange} = this.props
+		if (event.deltaY > 0 && current < labels.length - 1)
+			onChange(current + 1)
+		else if (event.deltaY < 0 && current > 0)
+			onChange(current - 1)
+		event.preventDefault()
 	}
 
 	startDrag(event) {
@@ -99,7 +109,7 @@ class SlidingControl extends Component {
 		let {name, title} = labels[current]
 		let offset = dragging ? dragOffset : offsets[current]
 		return (
-			<div class="sliding-control" onPointerDown={e => this.startDrag(e)}>
+			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel}>
 				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}></div>
 				<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
 					{labels.map(({title}, index) =>
