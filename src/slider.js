@@ -15,13 +15,27 @@ class Slider extends Component {
 		this.state.current = 0
 	}
 
+	componentDidMount() {
+		// Preload all images.
+		let {src, labels} = this.props
+		labels.forEach(label => {
+			let img = new Image()
+			img.src = this.labelToSrc(label)
+		})
+	}
+
+	// Returns image src for the given label.
+	labelToSrc(label) {
+		return this.props.src.replace('{}', label.name)
+	}
+
 	setCurrent(index) {
 		this.setState({current: index})
 	}
 
-	render({src, labels}, {current, offsets, maxLabelWidth, dragging, dragOffset}) {
-		let {name, title} = labels[current]
-		let img = src.replace('{}', name)
+	render({labels}, {current, offsets, maxLabelWidth, dragging, dragOffset}) {
+		let label, {name, title} = label = labels[current]
+		let img = this.labelToSrc(label)
 		return (
 			<div class="image-slider">
 				<img src={img} alt={title} />
