@@ -1025,6 +1025,7 @@ var SlidingControl = (function (Component$$1) {
 	function SlidingControl() {
 		Component$$1.call(this);
 		this.wheel = this.wheel.bind(this);
+		this.arrowButton = this.arrowButton.bind(this);
 		this.startDrag = this.startDrag.bind(this);
 		this.dragging = this.dragging.bind(this);
 		this.stopDrag = this.stopDrag.bind(this);
@@ -1040,7 +1041,7 @@ var SlidingControl = (function (Component$$1) {
 	SlidingControl.prototype.updateOffsets = function updateOffsets () {
 		var controls = Array.from(this.controls.children);
 		var maxLabelWidth = controls.reduce((function (max, n) { return Math.max(max, n.offsetWidth); }), 0);
-		var base = this.marker.offsetLeft + this.marker.offsetWidth / 2;
+		var base = maxLabelWidth / 2;
 		var offsets = controls.map(function (n) { return base - n.offsetLeft - n.offsetWidth / 2; });
 		this.setState({offsets: offsets, maxLabelWidth: maxLabelWidth});
 	};
@@ -1057,13 +1058,32 @@ var SlidingControl = (function (Component$$1) {
 		event.preventDefault();
 	};
 
+	SlidingControl.prototype.arrowButton = function arrowButton (event) {
+		var ref = this.props;
+		var current = ref.current;
+		var labels = ref.labels;
+		var onChange = ref.onChange;
+		// arrow right
+		if (event.keyCode == 39 && current < labels.length -1)
+			{ ok(current + 1); }
+		// arrow left
+		else if (event.keyCode == 37 && current > 0)
+			{ ok(current - 1); }
+		function ok(i) {
+			onChange(i);
+			event.preventDefault();
+		}
+	};
+
 	SlidingControl.prototype.startDrag = function startDrag (event) {
 		document.body.addEventListener('pointermove', this.dragging);
 		document.body.addEventListener('pointerup', this.stopDrag);
 		document.body.addEventListener('pointercancel', this.stopDrag);
 		this.setState({dragging: true, dragOffset: this.state.offsets[this.props.current]});
 		this.dragOrigin = event.clientX;
-		event.preventDefault();
+		// PEP Polyfill: don't prevent click on left/right buttons
+		if (!(event.target instanceof HTMLButtonElement))
+			{ event.preventDefault(); }
 	};
 
 	SlidingControl.prototype.dragging = function dragging (event) {
@@ -1092,12 +1112,10 @@ var SlidingControl = (function (Component$$1) {
 
 	SlidingControl.prototype.componentDidMount = function componentDidMount () {
 		this.updateOffsets();
-		window.addEventListener('resize', this.updateOffsets);
 	};
 
 	SlidingControl.prototype.componentWillUnmount = function componentWillUnmount () {
 		this.stopDrag();
-		window.removeEventListener('resize', this.updateOffsets);
 	};
 
 	SlidingControl.prototype.render = function render$$1 (ref, ref$1) {
@@ -1116,20 +1134,22 @@ var SlidingControl = (function (Component$$1) {
 		var title = ref$2.title;
 		var offset = dragging ? dragOffset : offsets[current];
 		return (
-			h( 'div', { class: "sliding-control", onPointerDown: this.startDrag, onWheel: this.wheel },
+			h( 'div', { class: "sliding-control", onPointerDown: this.startDrag, onWheel: this.wheel, onKeyDown: this.arrowButton, tabindex: "0", 'touch-action': "none" },
 				h( 'div', { class: "caption" },
 					h( 'button', { style: ("visibility: " + (current > 0 ? 'visible' : 'hidden')), onClick: function () { return onChange(current - 1); } }, "←"),
 					h( 'span', null, desc, " ", h( 'strong', null, title ) ),
 					h( 'button', { style: ("visibility: " + (current < labels.length - 1 ? 'visible' : 'hidden')), onClick: function () { return onChange(current + 1); } }, "→")
 				),
-				h( 'div', { class: "marker", style: ("width: " + maxLabelWidth + "px"), ref: function (el) { return this$1.marker = el; } }),
-				h( 'ol', { class: classNames('labels', dragging && '-dragging'), style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
-					labels.map(function (ref, index) {
-							var title = ref.title;
+				h( 'div', { class: "marker", style: ("width: " + maxLabelWidth + "px"), ref: function (el) { return this$1.marker = el; } },
+					h( 'ol', { class: classNames('labels', dragging && '-dragging'), style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
+						labels.map(function (ref, index) {
+								var title = ref.title;
 
-							return h( 'li', { class: classNames(current == index && '-current'), onClick: function () { return onChange(index); } }, title);
+								return h( 'li', { class: classNames(current == index && '-current'), onClick: function () { return onChange(index); } }, title);
 		}
-					)
+						)
+					),
+					h( 'div', { class: "border" })
 				)
 			)
 		)

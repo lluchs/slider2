@@ -15,24 +15,32 @@
   flex: 1;
 }
 .sliding-control > .marker {
-  border: 1px solid red;
   height: 1.2em;
   width: 2em;
   margin: auto;
-  padding: 0 0.5em;
+  position: relative;
 }
-.sliding-control > .labels {
+.sliding-control > .marker > .labels {
   list-style-type: none;
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   position: absolute;
+  top: 0;
   bottom: 0;
 }
-.sliding-control > .labels > li {
-  margin-right: 3em;
+.sliding-control > .marker > .labels > li {
+  padding: 0 3em;
 }
-.sliding-control > .labels:not(.-dragging) {
+.sliding-control > .marker > .labels:not(.-dragging) {
   transition: left 0.5s;
+}
+.sliding-control > .marker > .border {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
