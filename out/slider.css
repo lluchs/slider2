@@ -1,0 +1,38 @@
+.image-slider > img {
+  width: 100%;
+}
+.sliding-control {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+.sliding-control > .caption {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+.sliding-control > .caption > span {
+  flex: 1;
+}
+.sliding-control > .marker {
+  border: 1px solid red;
+  height: 1.2em;
+  width: 2em;
+  margin: auto;
+  padding: 0 0.5em;
+}
+.sliding-control > .labels {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  bottom: 0;
+}
+.sliding-control > .labels > li {
+  margin-right: 3em;
+}
+.sliding-control > .labels:not(.-dragging) {
+  transition: left 0.5s;
+}

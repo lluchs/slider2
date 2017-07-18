@@ -950,25 +950,94 @@ function render(vnode, parent, merge) {
   return diff(merge, vnode, {}, false, parent, false);
 }
 
+//import {initDevTools} from 'preact/devtools/devtools'
+//initDevTools()
+
+// Fancy image slider.
+// Props:
+//  - src: URI to image with {} as placeholder
+//  - labels: Array of labels with {name, title} objects. title is shown, name is inserted in src.
 var Slider = (function (Component$$1) {
 	function Slider() {
 		Component$$1.call(this);
-		this.dragging = this.dragging.bind(this);
-		this.stopDrag = this.stopDrag.bind(this);
+		this.setCurrent = this.setCurrent.bind(this);
 
 		this.state.current = 0;
-		this.state.offsets = [];
 	}
 
 	if ( Component$$1 ) Slider.__proto__ = Component$$1;
 	Slider.prototype = Object.create( Component$$1 && Component$$1.prototype );
 	Slider.prototype.constructor = Slider;
 
+	Slider.prototype.componentDidMount = function componentDidMount () {
+		var this$1 = this;
+
+		// Preload all images.
+		var ref = this.props;
+		var src = ref.src;
+		var labels = ref.labels;
+		labels.forEach(function (label) {
+			var img = new Image();
+			img.src = this$1.labelToSrc(label);
+		});
+	};
+
+	// Returns image src for the given label.
+	Slider.prototype.labelToSrc = function labelToSrc (label) {
+		return this.props.src.replace('{}', label.name)
+	};
+
 	Slider.prototype.setCurrent = function setCurrent (index) {
 		this.setState({current: index});
 	};
 
-	Slider.prototype.updateOffsets = function updateOffsets () {
+	Slider.prototype.render = function render$$1 (ref, ref$1) {
+		var desc = ref.desc;
+		var labels = ref.labels;
+		var current = ref$1.current;
+		var offsets = ref$1.offsets;
+		var maxLabelWidth = ref$1.maxLabelWidth;
+		var dragging = ref$1.dragging;
+		var dragOffset = ref$1.dragOffset;
+
+		var label;
+		var ref$2 = label = labels[current];
+		var name = ref$2.name;
+		var title = ref$2.title;
+		var img = this.labelToSrc(label);
+		return (
+			h( 'div', { class: "image-slider" },
+				h( 'img', { src: img, alt: title }),
+				h( SlidingControl, { desc: desc, labels: labels, current: current, onChange: this.setCurrent })
+			)
+		)
+	};
+
+	return Slider;
+}(Component));
+
+// Provides a sliding selection control.
+// Props:
+//  - labels: Array of labels with {name, title}
+//  - current: Index of currently active label
+//  - onChange(i): Function called when current changes to i
+var SlidingControl = (function (Component$$1) {
+	function SlidingControl() {
+		Component$$1.call(this);
+		this.wheel = this.wheel.bind(this);
+		this.startDrag = this.startDrag.bind(this);
+		this.dragging = this.dragging.bind(this);
+		this.stopDrag = this.stopDrag.bind(this);
+		this.updateOffsets = this.updateOffsets.bind(this);
+
+		this.state.offsets = [];
+	}
+
+	if ( Component$$1 ) SlidingControl.__proto__ = Component$$1;
+	SlidingControl.prototype = Object.create( Component$$1 && Component$$1.prototype );
+	SlidingControl.prototype.constructor = SlidingControl;
+
+	SlidingControl.prototype.updateOffsets = function updateOffsets () {
 		var controls = Array.from(this.controls.children);
 		var maxLabelWidth = controls.reduce((function (max, n) { return Math.max(max, n.offsetWidth); }), 0);
 		var base = this.marker.offsetLeft + this.marker.offsetWidth / 2;
@@ -976,50 +1045,67 @@ var Slider = (function (Component$$1) {
 		this.setState({offsets: offsets, maxLabelWidth: maxLabelWidth});
 	};
 
-	Slider.prototype.startDrag = function startDrag (event) {
+	SlidingControl.prototype.wheel = function wheel (event) {
+		var ref = this.props;
+		var labels = ref.labels;
+		var current = ref.current;
+		var onChange = ref.onChange;
+		if (event.deltaY > 0 && current < labels.length - 1)
+			{ onChange(current + 1); }
+		else if (event.deltaY < 0 && current > 0)
+			{ onChange(current - 1); }
+		event.preventDefault();
+	};
+
+	SlidingControl.prototype.startDrag = function startDrag (event) {
 		document.body.addEventListener('pointermove', this.dragging);
 		document.body.addEventListener('pointerup', this.stopDrag);
 		document.body.addEventListener('pointercancel', this.stopDrag);
-		this.setState({dragging: true, dragOffset: this.state.offsets[this.state.current]});
+		this.setState({dragging: true, dragOffset: this.state.offsets[this.props.current]});
 		this.dragOrigin = event.clientX;
 		event.preventDefault();
 	};
 
-	Slider.prototype.dragging = function dragging (event) {
+	SlidingControl.prototype.dragging = function dragging (event) {
 		// Update offset from distance moved since last event.
 		var dragOffset = this.state.dragOffset - this.dragOrigin + event.clientX;
 		this.dragOrigin = event.clientX;
 		// Update current image by comparing offsets of neighboring labels.
 		var ref = this.state;
-		var current = ref.current;
 		var offsets = ref.offsets;
+		var ref$1 = this.props;
+		var current = ref$1.current;
+		var onChange = ref$1.onChange;
 		if (current < offsets.length - 1 && dragOffset < (offsets[current] + offsets[current+1]) / 2)
-			{ current += 1; }
+			{ onChange(current + 1); }
 		else if (current > 0 && dragOffset > (offsets[current-1] + offsets[current]) / 2)
-			{ current -= 1; }
-		this.setState({dragOffset: dragOffset, current: current});
+			{ onChange(current - 1); }
+		this.setState({dragOffset: dragOffset});
 	};
 
-	Slider.prototype.stopDrag = function stopDrag () {
+	SlidingControl.prototype.stopDrag = function stopDrag () {
 		document.body.removeEventListener('pointermove', this.dragging);
 		document.body.removeEventListener('pointerup', this.stopDrag);
 		document.body.removeEventListener('pointercancel', this.stopDrag);
 		this.setState({dragging: false});
 	};
 
-	Slider.prototype.componentDidMount = function componentDidMount () {
+	SlidingControl.prototype.componentDidMount = function componentDidMount () {
 		this.updateOffsets();
+		window.addEventListener('resize', this.updateOffsets);
 	};
 
-	Slider.prototype.componentWillUnmount = function componentWillUnmount () {
+	SlidingControl.prototype.componentWillUnmount = function componentWillUnmount () {
 		this.stopDrag();
+		window.removeEventListener('resize', this.updateOffsets);
 	};
 
-	Slider.prototype.render = function render$$1 (ref, ref$1) {
+	SlidingControl.prototype.render = function render$$1 (ref, ref$1) {
 		var this$1 = this;
-		var src = ref.src;
+		var desc = ref.desc;
 		var labels = ref.labels;
-		var current = ref$1.current;
+		var current = ref.current;
+		var onChange = ref.onChange;
 		var offsets = ref$1.offsets;
 		var maxLabelWidth = ref$1.maxLabelWidth;
 		var dragging = ref$1.dragging;
@@ -1028,32 +1114,36 @@ var Slider = (function (Component$$1) {
 		var ref$2 = labels[current];
 		var name = ref$2.name;
 		var title = ref$2.title;
-		var img = src.replace('{}', name);
 		var offset = dragging ? dragOffset : offsets[current];
 		return (
-			h( 'div', { class: "slider" },
-				h( 'img', { class: "slider-image", src: img, alt: title }),
+			h( 'div', { class: "sliding-control", onPointerDown: this.startDrag, onWheel: this.wheel },
+				h( 'div', { class: "caption" },
+					h( 'button', { style: ("visibility: " + (current > 0 ? 'visible' : 'hidden')), onClick: function () { return onChange(current - 1); } }, "←"),
+					h( 'span', null, desc, " ", h( 'strong', null, title ) ),
+					h( 'button', { style: ("visibility: " + (current < labels.length - 1 ? 'visible' : 'hidden')), onClick: function () { return onChange(current + 1); } }, "→")
+				),
+				h( 'div', { class: "marker", style: ("width: " + maxLabelWidth + "px"), ref: function (el) { return this$1.marker = el; } }),
+				h( 'ol', { class: classNames('labels', dragging && '-dragging'), style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
+					labels.map(function (ref, index) {
+							var title = ref.title;
 
-				h( 'div', { class: "slider-wrapper", onPointerDown: function (e) { return this$1.startDrag(e); } },
-					h( 'div', { class: "marker", style: ("width: " + maxLabelWidth + "px"), ref: function (el) { return this$1.marker = el; } }),
-					h( 'ol', { class: ("slider-controls " + (dragging ? '-dragging' : '')), style: ("left: " + offset + "px"), ref: function (el) { return this$1.controls = el; } },
-						labels.map(function (ref, index) {
-								var title = ref.title;
-
-								return h( 'li', { class: current == index ? 'current' : '', onClick: function () { return this$1.setCurrent(index); } }, title);
+							return h( 'li', { class: classNames(current == index && '-current'), onClick: function () { return onChange(index); } }, title);
 		}
-						)
 					)
 				)
 			)
 		)
 	};
 
-	return Slider;
+	return SlidingControl;
 }(Component));
 
+function classNames() {
+	return Array.from(arguments).filter(function (a) { return !!a; }).join(' ')
+}
+
 var Slider2 = function Slider2(el, options$$1) {
-	render(h( Slider, { src: options$$1.src, labels: options$$1.labels }), el);
+	render(h( Slider, { desc: options$$1.desc, src: options$$1.src, labels: options$$1.labels }), el);
 };
 
 return Slider2;
