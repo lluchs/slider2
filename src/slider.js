@@ -54,6 +54,7 @@ class SlidingControl extends Component {
 	constructor() {
 		super()
 		this.wheel = this.wheel.bind(this)
+		this.arrowButton = this.arrowButton.bind(this)
 		this.startDrag = this.startDrag.bind(this)
 		this.dragging = this.dragging.bind(this)
 		this.stopDrag = this.stopDrag.bind(this)
@@ -77,6 +78,20 @@ class SlidingControl extends Component {
 		else if (event.deltaY < 0 && current > 0)
 			onChange(current - 1)
 		event.preventDefault()
+	}
+
+	arrowButton(event) {
+		let {current, labels, onChange} = this.props
+		// arrow right
+		if (event.keyCode == 39 && current < labels.length -1)
+			ok(current + 1)
+		// arrow left
+		else if (event.keyCode == 37 && current > 0)
+			ok(current - 1)
+		function ok(i) {
+			onChange(i)
+			event.preventDefault()
+		}
 	}
 
 	startDrag(event) {
@@ -123,7 +138,7 @@ class SlidingControl extends Component {
 		let {name, title} = labels[current]
 		let offset = dragging ? dragOffset : offsets[current]
 		return (
-			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel}>
+			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel} onKeyDown={this.arrowButton} tabindex="0">
 				<div class="caption">
 					<button style={`visibility: ${current > 0 ? 'visible' : 'hidden'}`} onClick={() => onChange(current - 1)}>←</button>
 					<span>{desc} <strong>{title}</strong></span>
