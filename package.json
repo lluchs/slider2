@@ -5,7 +5,8 @@
   "main": "src/slider.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c && lessc src/slider.less out/slider.css"
+    "build": "rollup -c && lessc src/slider.less out/slider.css",
+    "build-min": "npm run build && uglifyjs out/slider.js -o out/slider.min.js -c -m"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,8 @@
     "less": "^2.7.2",
     "rollup": "^0.45.2",
     "rollup-plugin-buble": "^0.15.0",
-    "rollup-plugin-node-resolve": "^3.0.0"
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "uglify-js": "^3.0.25"
   },
   "dependencies": {
     "preact": "^8.2.1"

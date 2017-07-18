@@ -1,7 +1,7 @@
 import { h, render, Component } from 'preact'
 
-import {initDevTools} from 'preact/devtools/devtools'
-initDevTools()
+//import {initDevTools} from 'preact/devtools/devtools'
+//initDevTools()
 
 // Fancy image slider.
 // Props:
