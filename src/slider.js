@@ -100,7 +100,9 @@ class SlidingControl extends Component {
 		document.body.addEventListener('pointercancel', this.stopDrag)
 		this.setState({dragging: true, dragOffset: this.state.offsets[this.props.current]})
 		this.dragOrigin = event.clientX
-		event.preventDefault()
+		// PEP Polyfill: don't prevent click on left/right buttons
+		if (!(event.target instanceof HTMLButtonElement))
+			event.preventDefault()
 	}
 
 	dragging(event) {
