@@ -22,14 +22,17 @@
 		margin: 0;
 		padding: 0;
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 
 		position: absolute;
 		top: 0;
-		width: 100%;
+		
+		> li {
+			margin-right: 3em;
+		}
 	}
 
-	.labels:not(.-dragging) {
+	> .labels:not(.-dragging) {
 		transition: left 0.5s;
 	}
 }
