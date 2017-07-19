@@ -147,7 +147,10 @@ class SlidingControl extends Component {
 				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}>
 					<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
 						{labels.map(({title}, index) =>
-							<li class={classNames(current == index && '-current')} onClick={() => onChange(index)}>{title}</li>
+							<li class={classNames(current == index && '-current',
+							                      index < current && `-pre-${Math.min(current - index, 3)}`,
+							                      index > current && `-post-${Math.min(index - current, 3)}`
+							)} onClick={() => onChange(index)}>{title}</li>
 						)}
 					</ol>
 					<div class="border"></div>
