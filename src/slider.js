@@ -140,9 +140,9 @@ class SlidingControl extends Component {
 		return (
 			<div class="sliding-control" onPointerDown={this.startDrag} onWheel={this.wheel} onKeyDown={this.arrowButton} tabindex="0" touch-action="none">
 				<div class="caption">
-					<button style={`visibility: ${current > 0 ? 'visible' : 'hidden'}`} onClick={() => onChange(current - 1)}>←</button>
+					<button style={`visibility: ${current > 0 ? 'visible' : 'hidden'}`} onClick={() => onChange(current - 1)}>🡰</button>
 					<span>{desc} <strong>{title}</strong></span>
-					<button style={`visibility: ${current < labels.length - 1 ? 'visible' : 'hidden'}`} onClick={() => onChange(current + 1)}>→</button>
+					<button style={`visibility: ${current < labels.length - 1 ? 'visible' : 'hidden'}`} onClick={() => onChange(current + 1)}>🡲</button>
 				</div>
 				<div class="marker" style={`width: ${maxLabelWidth}px`} ref={el => this.marker = el}>
 					<ol class={classNames('labels', dragging && '-dragging')} style={`left: ${offset}px`} ref={el => this.controls = el}>
