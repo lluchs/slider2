@@ -7,12 +7,18 @@ import { h, render, Component } from 'preact'
 // Props:
 //  - src: URI to image with {} as placeholder
 //  - labels: Array of labels with {name, title} objects. title is shown, name is inserted in src.
+//  - desc: Description for the whole slider
+//  - default: Index, name or title of the initial element
 class Slider extends Component {
-	constructor() {
-		super()
+	constructor(props) {
+		super(props)
 		this.setCurrent = this.setCurrent.bind(this)
 
-		this.state.current = 0
+		this.state.current = typeof props.default == 'number'
+			? props.default
+			: typeof props.default == 'string'
+			? props.labels.findIndex(({name, title}) => name == props.default || title == props.default)
+			: 0
 	}
 
 	componentDidMount() {
@@ -166,6 +172,6 @@ function classNames() {
 
 export default class Slider2 {
 	constructor(el, options) {
-		render(<Slider desc={options.desc} src={options.src} labels={options.labels} />, el)
+		render(<Slider desc={options.desc} src={options.src} labels={options.labels} default={options.default} />, el)
 	}
 }
